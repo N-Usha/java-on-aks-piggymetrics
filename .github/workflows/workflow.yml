@@ -18,6 +18,7 @@ env:
   STATISTICS_SERVICE_PORT: '7000'
   NOTIFICATION_SERVICE_PORT: '8000'
   IMAGE_TAG: ga-${{ github.sha }} 
+  AZURE_KEY_VAULT: piggymetrics
 
 jobs:
   build:
@@ -28,7 +29,15 @@ jobs:
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
+   
+    - name: Azure key vault - Get Secrets
+      uses: Azure/get-keyvault-secrets@v1
+      with:
+        # Name of the azure key vault
+       keyvault: ${{ env.AZURE_KEY_VAULT }}
+        # Name of the secret to be fetched
+       secrets:  '*'
+       
     - run: |
          export CONTAINER_REGISTRY=${{ secrets.AZURE_CONTAINER_REGISTRY }}
          export IMAGE_TAG=${{ env.IMAGE_TAG }}
